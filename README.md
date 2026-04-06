@@ -1,9 +1,7 @@
 # ZEUS — Autonomous Payload-Delivery Hexacopter
 
 ![SAE India](https://img.shields.io/badge/SAE%20India-Sponsored-005CAB)
-![Competition](https://img.shields.io/badge/Rotorcraft%20Nitte-2024-orange)
 ![Pixhawk](https://img.shields.io/badge/Pixhawk-Cube%20Orange-red)
-![Frame](https://img.shields.io/badge/Frame-Carbon%20Fiber-333)
 ![CAD](https://img.shields.io/badge/CAD-SolidWorks-CC0000)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
