@@ -1,345 +1,116 @@
-# ZEUS
+# ZEUS — Autonomous Payload-Delivery Hexacopter
 
-ZEUS is a custom-built hexacopter UAV developed by **Team ASRL** at SRM Institute of Science and Technology for the **Rotorcraft Nitte 2024** competition (Team No: ROTOR2407).
+![ArduPilot](https://img.shields.io/badge/ArduPilot-Mission%20Planner-blue)
+![Pixhawk](https://img.shields.io/badge/Pixhawk-Cube%20Orange-red)
+![Frame](https://img.shields.io/badge/Frame-Carbon%20Fiber-333)
+![CAD](https://img.shields.io/badge/CAD-SolidWorks-CC0000)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-> **Team Members:** P. Tarun Kumar, Raghunath VM, Adarsh Jha, Manan Wadhwa, Rhythm Pareek, Muhammed Sahal M N, Vijay Solanki, Akshika Pathania
+A custom-built hexacopter for autonomous waypoint missions with a 900 g servo-actuated payload drop. Designed and flown by **Team ASRL** at SRM Institute of Science and Technology for **Rotorcraft Nitte 2024** (Team No. ROTOR2407).
 
----
+## Overview
 
-## Conceptual Design
+ZEUS is a 2 kg-class hexacopter built around a Pixhawk Cube Orange flight controller and a topology-optimised 3K carbon-fiber frame. The mission profile is autonomous take-off → GPS waypoint navigation → target loiter → payload release → return to home, planned and uploaded via Mission Planner over a 433 MHz MAVLink telemetry link.
 
-<!-- ADD IMAGE HERE: Fig 1 - High Level View (actual photo of ZEUS on ground) -->
+The hexacopter configuration was chosen over a quadcopter for the 50% thrust margin and motor-failure tolerance, and over an octocopter to keep weight and current draw low enough to fit a 5+ minute flight envelope on a single 6S battery pack.
 
-ZEUS is engineered for autonomous flight missions with precision payload delivery. Built on a lightweight carbon fiber hexacopter frame, it integrates an advanced avionics stack to perform fully autonomous waypoint navigation and controlled payload dropping.
+## System Architecture
 
----
+<p align="center">
+  <img src="architecture.png" width="100%" alt="ZEUS System Architecture"/>
+</p>
 
-## Detailed Design
-
-### Weight Estimation
-
-The take-off weight is calculated using:
-
-```
-Wto = Woe + Wpl + Wf
-```
+## Specifications
 
 | Parameter | Value |
 |---|---|
-| Operational Weight (Woe) | 671g (Frame 250g + Electronics 421g) |
-| Payload Weight (Wpl) | 900g |
-| Battery / Fuel Weight (Wf) | 480g |
-| **Total Take-off Weight** | **2051g** |
+| Configuration | X-Hexacopter |
+| Take-off weight | 2051 g |
+| Payload capacity | 900 g |
+| Diagonal wheelbase | 335 mm |
+| Overall (L × W × H) | 335.5 × 290.5 × 237.6 mm |
+| Endurance (80% discharge) | ~5.2 min |
+| Hover power | 625 W |
+| Cruise current | ~24 A |
+| Battery | 2× 1300 mAh 6S LiPo (parallel, 25.2 V, 100C) |
 
-> Preliminary estimate was 2120g. Final estimate is 2051g — a difference of 69g after design refinement.
+## Hardware
 
----
+| Subsystem | Component | Notes |
+|---|---|---|
+| Flight controller | Pixhawk Cube Orange | 3× redundant IMUs, EKF, temperature stabilised |
+| GPS / INS | Here3 | RTK + gyro/accel/mag/baro over CAN |
+| Telemetry | Holybro SiK | MAVLink, 433 MHz, 500 mW |
+| RC link | TBS Tango 2 Pro + Crossfire Rx | 915 MHz, 4 km range, 8 channels |
+| Motors | 6× Emax ECO II 2306, 1700 KV | BLDC, 5" tri-blade props |
+| ESCs | 2× 4-in-1, 50 A | 3S–6S, 1000 µF spike caps |
+| Payload servo | Single-rod double-door release | Torque-balanced drop |
+| Frame | 3K roll-wrapped CF tubes + CF plates | Topology-optimised |
+| Landing gear | Skid type, 100 mm clearance | PLA+ FDM print |
 
-### Thrust Estimation
+## Design Process
 
-```
-Thrust for take-off = Total Weight + 20% margin
-                    = 2051g + 410.2g = 2461.2g
+**Weight estimation.** `Wto = Woe + Wpl + Wf` → 671 g operational + 900 g payload + 480 g battery = 2051 g final, down 69 g from the 2120 g preliminary estimate after frame iteration.
 
-Thrust per motor = 2461.2 / 6 = 410.2g
-```
+**Thrust budget.** 20% margin above hover gives 2461 g total static thrust → 410 g per motor. The Emax ECO II 2306 / 5" tri-blade combination clears this comfortably at ~4 A per motor.
 
----
+**Power & endurance.** 6 × 100.8 W motor draw + 20 W avionics = 625 W total. With a 65.52 Wh pack and 80% safe discharge, the endurance works out to ~5.2 min — sufficient for the competition mission profile.
 
-### Propulsion System
+**Frame iterations.**
+1. *Iteration 1* — built for strength, 15 mm CF round tube arms, dual motor mount attachments. Too heavy, too many fasteners.
+2. *Iteration 2* — pultruded CF square tube arms, motor mount bolts cut from 9 to 2. Significant weight reduction.
+3. *Final* — 8 mm 3K roll-wrapped CF tube arms (lighter and stronger than pultruded), reduced top-to-base plate spacing for stiffness.
 
-<!-- ADD IMAGE HERE: Fig 2 - BLDC Motor (Emax ECO II 2306) -->
-<!-- ADD IMAGE HERE: Fig 3 - 5-inch Tri-blade Propeller -->
+**Topology optimisation.** Two FEA load cases applied to the base plate — fixtures at arm mounts with center load, and the inverse — final geometry combines both results to remove material where neither case carries stress.
 
-An electrical propulsion system was selected for environment-friendly, low carbon footprint operations.
+**Static structural analysis.** Whole-frame FEA validated against the worst-case combined thrust of all six motors (~120 N) to ensure plate integrity under maximum flight load.
 
-- **Motors:** Emax ECO II 2306, 1700KV BLDC — high torque, durable, low electrical noise
-- **Propellers:** 5-inch tri-blade — optimum performance with maximum stability
-- **Battery:** 2x 1300mAh 6S LiPo connected in parallel → 2600mAh, 25.2V nominal, 100C discharge rate
+## Autonomous Mission
 
----
-
-### UAV Configuration Selection
-
-<!-- ADD IMAGE HERE: Fig 4, 5, 6 - X Quad / X Hexa / X Octo configuration diagrams (side by side) -->
-
-| Configuration | Weight | Endurance | Stability | Thrust |
-|---|---|---|---|---|
-| Quadcopter | Low | High | Low | Low |
-| **Hexacopter** | **Medium** | **Medium** | **High** | **High** |
-| Octacopter | High | Low | High | High |
-
-A **Hexacopter** was selected — two extra motors over a quadcopter increase thrust by 50%, reduce per-motor load and current draw, and provide greater stability for smooth flight. An Octocopter adds unnecessary weight for this mission.
-
----
-
-### Wheelbase & Sizing
-
-<!-- ADD IMAGE HERE: Fig 7 - Wheelbase diagram with dimensions -->
-<!-- ADD IMAGE HERE: Fig 8 - Top View drawing -->
-<!-- ADD IMAGE HERE: Fig 9 - Side View drawing -->
-<!-- ADD IMAGE HERE: Fig 10 - Front View drawing -->
-
-- Horizontal wheelbase from centre motor mount: **168mm**
-- Diagonal wheelbase: **335mm**
-- Propeller clearance: **40mm** (to prevent collisions)
-- All electronics placed on the top plate for optimal CG and easy access
-- Two battery slots positioned front and back symmetrically for CG balance
-
-**Overall Dimensions:** L = 335.5mm, W = 290.5mm, H = 237.6mm
-**Landing gear height:** 100mm ground clearance — sufficient for payload bay attachment without ground collision
-
----
-
-### UAV Performance
-
-#### Power Estimation
+Mission planning is done in **Mission Planner (ArduPilot)**. The pilot defines the home position, take-off altitude (5 m), waypoint sequence, and return-to-home behaviour; the full plan is uploaded to the Pixhawk over MAVLink before flight.
 
 ```
-Hover current per motor : 4A
-Voltage                 : 25.2V
-Power per motor         : 100.8W
-Power (6 motors)        : 604.8W
-Electronics overhead    : ~20W
-Total power consumption : 625W
-Energy for 5 min flight : 51.875 Wh
+Arm + Take-off  →  Waypoint nav  →  Target loiter  →  Payload drop  →  Return to home
 ```
 
-#### Power System
-
-```
-Battery energy = 2.6 Ah × 25.2V = 65.52 Wh  ✓ (exceeds 51.875 Wh required)
-```
-
-#### Endurance
-
-```
-Average Amp Drawn = (2.051 kg × 294.811 W/kg) / 25.2V = 23.99A
-
-Flight time (80% discharge) = (2.6 × 0.8) / 23.99 = 5.201 min
-```
-
----
-
-### Design Iterations
-
-<!-- ADD IMAGE HERE: Fig 11 - Iteration 1 (SolidWorks render) -->
-<!-- ADD IMAGE HERE: Fig 12 - Iteration 2 (SolidWorks render, front and top view) -->
-<!-- ADD IMAGE HERE: Fig 13 - Final Iteration (top view render) -->
-
-**Iteration 1** — Designed for maximum strength. Base plate topology-optimized with 10% material removal. 15mm CF tubes used in arms. Motor mounts with dual arm attachments. Drawback: excessive weight and fastener count.
-
-**Iteration 2** — Focus on weight reduction. Maximum topology optimization. 15mm CF tubes replaced with pultruded CF square tubes. Motor mount bolts reduced from 9 to 2 per motor.
-
-**Final Iteration** — Minimized distance between base and top plate for maximum stability. Pultruded CF tubes replaced with 8mm circular 3K roll-wrapped CF tubes — lighter per arm and significantly stronger.
-
----
-
-### Material Selection
-
-<!-- ADD IMAGE HERE: Fig 14 - CF Tube 3K Roll -->
-
-**Carbon Fiber Plate (Frame)**
-High strength-to-weight ratio — withstands flight stresses while keeping weight minimal. Rigid under high loads, maintaining structural integrity and preventing flex that could affect stability.
-
-**Carbon Fiber Tube (Arms)**
-3K roll-wrapped CF tubes selected for drone arms — excellent strength-to-weight ratio, essential for efficient flight.
-
-**PLA+ (3D Printed Attachments)**
-Complex attachment parts manufactured via 3D printing using PLA+ — higher strength and toughness than standard PLA, with better layer-to-layer adhesion preventing delamination.
-
----
-
-### Subsystem Selection
-
-#### Telemetry
-
-<!-- ADD IMAGE HERE: Fig 15 - Holybro Telemetry SiK Module -->
-
-**Holybro Telemetry SiK Module** — MAVLink-compatible, integrates with Mission Planner. Output: 500mW, Frequency: 433MHz.
-
-#### Radio Transmission
-
-<!-- ADD IMAGE HERE: Fig 16 - TBS Tango 2 Pro Transmitter & Crossfire Receiver -->
-
-**TBS Tango 2 Pro** — Crossfire protocol, 915MHz, range up to 4km. 8 channels: 4 for UAV movement control, remainder for flight modes.
-
-#### Flight Controller & GPS
-
-<!-- ADD IMAGE HERE: Fig 17 - Pixhawk Cube Orange -->
-<!-- ADD IMAGE HERE: Fig 18 - Here3 GPS -->
-
-**Pixhawk Cube Orange**
-- 3 sets of IMU sensors for redundancy
-- 2 vibration-isolated IMUs for accurate state estimation
-- Temperature-controlled IMUs via onboard heating resistors
-
-**Here3 GPS** — Full inertial navigation (gyroscope, accelerometer, compass, barometer) + GNSS. RTK positioning data fused with Extended Kalman Filter (EKF) in ArduPilot/PX4 for optimized positioning.
-
-#### Electronic Speed Controllers
-
-<!-- ADD IMAGE HERE: Fig 19 - Speedybee 50A ESC -->
-<!-- ADD IMAGE HERE: Fig 20 - HGLRC 50A ESC -->
-
-Two **4-in-1 ESC modules** (vs. 6 individual ESCs) to reduce weight. Voltage range: 3S–6S. Max current: 50A per module. 1000μF capacitor per ESC to filter current spikes from PWM signal changes.
-
----
-
-### Electronics Architecture
-
-<!-- ADD IMAGE HERE: Electronics Architecture block diagram (from PDF page 13) -->
-
-```
-BLDC x6 → ESC x6 → Pixhawk Cube Orange Flight Controller
-                         ↑               ↑
-               Radio Telemetry     Transmitter TX
-                         ↓
-                  Power Module (PixHawk)
-                         ↓
-                      PDB + BEC
-                         ↑
-              LiPo Battery Pack → Battery Management System
-```
-
----
-
-### CG Estimation & Stability Analysis
-
-<!-- ADD IMAGE HERE: Fig 21 - Center of Gravity (loaded and unloaded CG side-by-side renders) -->
-
-Two battery slots placed symmetrically front and back of the frame. CG estimated to lie near the midpoint of the two battery slots, above the drone's geometric origin.
-
-#### Topology Optimization
-
-<!-- ADD IMAGE HERE: Fig 22 - Topology Optimization results (two heat maps side by side) -->
-
-Goal: lightweight structure without compromising structural integrity. Two methods applied:
-- **Method 1:** Fixtures at arm mountings, force at plate center
-- **Method 2:** Center fixed, force applied at arm mountings
-
-Final design incorporates both optimized results.
-
-#### Static Structural Analysis
-
-<!-- ADD IMAGE HERE: Fig 23 - Structural Analysis (SolidWorks FEA results) -->
-
-Performed under maximum combined thrust of all 6 motors (**120N**) to validate plate integrity under worst-case flight loads.
-
-#### Landing Gear
-
-<!-- ADD IMAGE HERE: Fig 24 - Landing Gear FEA analysis render -->
-
-Skid-type landing gear selected for maximum stability and ground surface contact. Designed in SolidWorks to maximize strength while minimizing weight. Complex geometry manufactured via 3D printing.
-
----
-
-## Autonomous Operations & Payload Mechanism
-
-### Autonomous Flight
-
-<!-- ADD IMAGE HERE: Fig 25 - Mission Planner Take-off screenshot -->
-<!-- ADD IMAGE HERE: Fig 26 - Mission Planner Waypoints screenshot -->
-
-Mission programmed via **Mission Planner (ArduPilot)**. Full mission breakdown:
-
-**Phase 1 — Take-off:** Altitude set to 5m in ground station software.
-
-**Phase 2 — Waypoint Navigation:** Multiple GPS waypoints defined between home location and target area. Drone follows planned path autonomously.
-
-**Phase 3 — Return to Home:** On mission completion, drone autonomously returns to home position.
-
-### Payload Dropping Mechanism
-
-<!-- ADD IMAGE HERE: Fig 27 - Payload Mechanism (double-door bay open and closed) -->
-
-- **Double-door payload bay** mounted below the frame
-- Servo-actuated locking mechanism using a single moving rod
-- Double-door design prevents torque-induced disturbance during payload release
-- Safe, controlled drop without affecting flight stability
-
----
-
-## Weight Breakdown
-
-### Electronics
-
-| Component | Weight (g) | Qty | Total (g) |
-|---|---|---|---|
-| BLDC Motors | 30.4 | 6 | 182.4 |
-| Battery | 230 | 2 | 460 |
-| 4-in-1 ESC | 18 | 2 | 36 |
-| Here3 GPS | 48.8 | 1 | 48.8 |
-| Pixhawk Cube Orange | 73 | 1 | 73 |
-| Holybro Telemetry | 15 | 1 | 15 |
-| Crossfire Receiver | 2 | 1 | 2 |
-| Power Module | 14 | 1 | 14 |
-| Propeller | 6.8 | 6 | 40.8 |
-| Servo Motor | 9 | 1 | 9 |
-| **Total** | | | **881g** |
-
-### Frame
-
-| Component | Weight (g) | Qty | Total (g) |
-|---|---|---|---|
-| Base plate | 46.23 | 1 | 46.23 |
-| Top plate | 28.48 | 1 | 28.48 |
-| FC plate | 19.81 | 1 | 19.81 |
-| Arm tube | 4.83 | 6 | 28.98 |
-| Motor Mount plate | 1.08 | 6 | 6.48 |
-| LG Vertical | 4.39 | 2 | 8.78 |
-| LG Horizontal | 6.59 | 2 | 13.18 |
-| M3 × 20mm bolt | 1.60 | 24 | 38.4 |
-| M3 × 8mm bolt | 1.1 | 6 | 6.6 |
-| LG to Base mount | 6.5 | 2 | 13 |
-| LG Damper | 1 | 4 | 4 |
-| Arm mount | 1.5 | 12 | 18 |
-| MM attachment | 1 | 12 | 12 |
-| T attachment | 2 | 2 | 4 |
-| **Total** | | | **247.94g** |
-
----
+The payload bay sits below the frame on a double-door mechanism actuated by a single servo driving a sliding lock rod. The double-door geometry cancels reaction torque at release so the drop does not perturb attitude.
 
 ## Bill of Materials
 
-| Component | Unit Price (₹) | Qty | Total (₹) |
-|---|---|---|---|
-| BLDC Motor | 1465 | 6 | 8790 |
-| Battery | 2499 | 2 | 4998 |
-| 4-in-1 ESC | 4049 | 2 | 8098 |
-| Here3 GPS | 18093 | 1 | 18093 |
-| Pixhawk Cube Orange | 32999 | 1 | 32999 |
-| Holybro Telemetry | 7563 | 1 | 7563 |
-| Transmitter & Receiver | 26378 | 1 | 26378 |
-| Propeller | 179 | 2 | 358 |
-| Servo Motor | 97 | 1 | 97 |
-| CF Plate (2.5mm) | 4308 | 1 | 4308 |
-| CF Tube (8mm) | 649 | 3 | 1947 |
-| PLA+ | 999 | 1 | 999 |
-| **Total** | | | **₹1,14,628** |
-
----
-
-## Engineering Drawing
-
-<!-- ADD IMAGE HERE: Full engineering drawing sheet — front view, right view, top view, isometric view with all dimensions and summary data table -->
-
-**Summary Data**
-
-| Parameter | Value |
-|---|---|
-| Dimensions | L=335.5mm, W=290.5mm, H=237.6mm |
-| Empty Weight | 1250g |
-| Motor | Emax ECO II 2306, 1700KV |
-
-| Station | Weight (g) | Datum Distance (mm) |
+| Component | Qty | Total (₹) |
 |---|---|---|
-| Frame Weight | 350g | 148mm |
-| Battery 1 | 520g | 89mm |
-| Battery 2 | 520g | 199mm |
-| Motors | 180g | 0mm, 145mm, 290mm |
-| Electronics | 120g | 145mm |
-| Others | 80g | 148mm |
+| Pixhawk Cube Orange | 1 | 32,999 |
+| TBS Tango 2 + Crossfire Rx | 1 | 26,378 |
+| Here3 GPS | 1 | 18,093 |
+| BLDC motors (Emax ECO II 2306) | 6 | 8,790 |
+| 4-in-1 ESC (50 A) | 2 | 8,098 |
+| Holybro Telemetry | 1 | 7,563 |
+| 6S 1300 mAh LiPo | 2 | 4,998 |
+| CF plate (2.5 mm) | 1 | 4,308 |
+| CF tube (8 mm) | 3 | 1,947 |
+| PLA+ filament | 1 | 999 |
+| Propellers, servo | — | 455 |
+| **Total** | | **₹1,14,628** |
 
----
+## Repository Layout
 
-*Developed by Team ASRL — SRM Institute of Science and Technology | Rotorcraft Nitte 2024*
+```
+zeus/
+├── cad/              # SolidWorks parts, assemblies, and rendering setups
+├── architecture.svg  # System architecture diagram (vector)
+├── architecture.png  # Rendered architecture diagram
+└── README.md
+```
+
+## Stack
+
+`ArduPilot` · `Mission Planner` · `Pixhawk Cube Orange` · `Here3 RTK GPS` · `MAVLink` · `Crossfire` · `SolidWorks` · `FEA` · `Carbon Fiber` · `PLA+`
+
+## Team
+
+**Team ASRL — SRM Institute of Science and Technology**
+P. Tarun Kumar · Raghunath VM · Adarsh Jha · Manan Wadhwa · Rhythm Pareek · Muhammed Sahal M N · Vijay Solanki · Akshika Pathania
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
