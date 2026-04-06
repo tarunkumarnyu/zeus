@@ -248,13 +248,6 @@ Two **4-in-1 ESC modules** chosen instead of six individual ESCs to save weight,
   <img src="architecture.png" width="100%" alt="ZEUS System Architecture"/>
 </p>
 
-The original electronics block diagram from the design report:
-
-<p align="center">
-  <img src="assets/figures/electronics_block.png" width="65%" alt="Electronics block diagram"/>
-  <br/><em>Fig. 19 — Electronics architecture (design report block diagram)</em>
-</p>
-
 ## CG, Topology Optimisation & FEA
 
 **CG estimation.** Two battery slots are placed symmetrically front and back of the frame. The loaded CG falls almost exactly at the midpoint of the two battery slots and slightly above the geometric origin of the airframe — close enough to the thrust centroid that no asymmetric trim is required.
