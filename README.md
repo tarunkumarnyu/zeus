@@ -1,12 +1,15 @@
 # ZEUS — Autonomous Payload-Delivery Hexacopter
 
-![ArduPilot](https://img.shields.io/badge/ArduPilot-Mission%20Planner-blue)
+![SAE India](https://img.shields.io/badge/SAE%20India-Sponsored-005CAB)
+![Competition](https://img.shields.io/badge/Rotorcraft%20Nitte-2024-orange)
 ![Pixhawk](https://img.shields.io/badge/Pixhawk-Cube%20Orange-red)
 ![Frame](https://img.shields.io/badge/Frame-Carbon%20Fiber-333)
 ![CAD](https://img.shields.io/badge/CAD-SolidWorks-CC0000)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-A custom-built hexacopter for autonomous waypoint missions with a 900 g servo-actuated payload drop. Designed and flown by **Team ASRL** at SRM Institute of Science and Technology for **Rotorcraft Nitte 2024** (Team No. ROTOR2407).
+> **Note —** This is an **aero design project**, not a software repository. There is no source code: the work covers conceptual design, weight & thrust budgeting, structural analysis, CAD, and the build itself. This repo holds the SolidWorks assets, the system architecture, and the engineering drawing produced for the design report.
+
+A custom-built hexacopter for autonomous waypoint missions with a 900 g servo-actuated payload drop. Designed and built by **Team ASRL** at SRM Institute of Science and Technology for **Rotorcraft Design Challenge — Nitte 2024**, the annual collegiate aero-design competition organised by **NMAM Institute of Technology** under the **SAE India Aerospace** banner (Team No. ROTOR2407).
 
 ## Overview
 
@@ -92,13 +95,30 @@ The payload bay sits below the frame on a double-door mechanism actuated by a si
 | Propellers, servo | — | 455 |
 | **Total** | | **₹1,14,628** |
 
+## Engineering Drawing
+
+Final dimensioned drawing from the design report — front, right, top, and isometric views with weight & balance summary.
+
+<p align="center">
+  <img src="engineering_drawing.png" width="100%" alt="ZEUS engineering drawing — front, right, top, isometric views with weight & balance"/>
+</p>
+
+| Parameter | Value |
+|---|---|
+| Length × Width × Height | 335.5 × 290.5 × 237.6 mm |
+| Empty weight | 1250 g |
+| Motor | Emax ECO II 2306, 1700 KV |
+| Propeller diameter | 130.55 mm (5″) |
+| Landing gear clearance | 100 mm |
+
 ## Repository Layout
 
 ```
 zeus/
-├── cad/              # SolidWorks parts, assemblies, and rendering setups
-├── architecture.svg  # System architecture diagram (vector)
-├── architecture.png  # Rendered architecture diagram
+├── cad/                     # SolidWorks parts, assemblies, and rendering setups
+├── architecture.svg         # System architecture diagram (vector)
+├── architecture.png         # Rendered architecture diagram
+├── engineering_drawing.png  # Final dimensioned drawing (4-view + W&B)
 └── README.md
 ```
 
