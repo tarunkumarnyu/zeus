@@ -34,6 +34,11 @@ A custom-built hexacopter for autonomous waypoint missions with a 900 g servo-ac
 
 ## Conceptual Design
 
+<p align="center">
+  <img src="assets/figures/hero_zeus.png" width="80%" alt="ZEUS hexacopter — high level view"/>
+  <br/><em>Fig. 1 — High level view of the assembled ZEUS platform</em>
+</p>
+
 ZEUS is a 2 kg-class hexacopter engineered for autonomous flight with precision payload delivery. The platform integrates a topology-optimised carbon-fiber airframe, a Pixhawk-based avionics stack, and a torque-balanced double-door payload bay. The full mission — take-off, GPS waypoint navigation, target loiter, payload release, return-to-home — is planned in Mission Planner and executed autonomously by the flight controller.
 
 The hexacopter configuration was chosen over a quadcopter for the 50% thrust margin and motor-failure tolerance, and over an octocopter to keep weight and current draw low enough to fit a 5+ minute flight envelope on a single 6S battery pack.
@@ -76,6 +81,13 @@ An electric propulsion system was chosen for low noise, zero local emissions, an
 | Propellers | **5″ tri-blade** | Best stability/efficiency trade for the wheelbase; tri-blade preferred over bi-blade for thrust at this disc loading |
 | Battery | **2× 1300 mAh 6S LiPo (parallel)** | 2600 mAh, 25.2 V nominal, 100C discharge — supports peak current and 5 min endurance |
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/motor_emax.png" width="240"/><br/><em>Fig. 2 — Emax ECO II 2306 BLDC motor</em></td>
+<td align="center"><img src="assets/figures/prop_5inch.png" width="240"/><br/><em>Fig. 3 — 5″ tri-blade propeller</em></td>
+</tr>
+</table>
+
 ## UAV Configuration Selection
 
 | Configuration | Weight | Endurance | Stability | Thrust |
@@ -86,6 +98,14 @@ An electric propulsion system was chosen for low noise, zero local emissions, an
 
 **Why hexacopter:** Two extra motors over a quadcopter increase total static thrust by 50%, reduce per-motor load and current draw, and provide tolerance to a single-motor failure (the controller can compensate by re-mixing the remaining five). An octocopter would add weight and current draw without a meaningful payload-fraction gain at this scale.
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/config_quad.png" width="220"/><br/><em>Fig. 4 — X Quad</em></td>
+<td align="center"><img src="assets/figures/config_hex.png" width="220"/><br/><em>Fig. 5 — X Hexa (selected)</em></td>
+<td align="center"><img src="assets/figures/config_octo.png" width="220"/><br/><em>Fig. 6 — X Octo</em></td>
+</tr>
+</table>
+
 ## Wheelbase & Sizing
 
 - **Horizontal wheelbase** (centre to centre, adjacent motor mount): **168 mm**
@@ -95,6 +115,13 @@ An electric propulsion system was chosen for low noise, zero local emissions, an
 - **Landing gear height**: 100 mm — sufficient ground clearance for payload bay attachment without ground strike
 
 All electronics live on the top plate for CG balance and easy field access. The two batteries sit symmetrically front and rear at datum distances of 89 mm and 199 mm so the loaded CG stays within ±5 mm of the geometric centre.
+
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/view_top.png" width="320"/><br/><em>Fig. 7 — Wheelbase &amp; top view dimensions</em></td>
+<td align="center"><img src="assets/figures/view_lg.png" width="380"/><br/><em>Fig. 8 — Front view with landing-gear clearance</em></td>
+</tr>
+</table>
 
 ## Power & Endurance
 
@@ -143,6 +170,14 @@ Aggressive topology optimisation on every plate. 15 mm CF round tubes replaced w
 **Final Iteration — Stability + strength.**
 Distance between base and top plate **minimised** to maximise frame torsional stiffness. Pultruded square tubes replaced with **8 mm circular 3K roll-wrapped CF tubes** — lighter per arm and significantly stronger than pultruded due to the continuous fibre wrap. This is the version that flew.
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/iter1.png" width="260"/><br/><em>Fig. 9 — Iteration 1 (strength-first)</em></td>
+<td align="center"><img src="assets/figures/iter2.png" width="260"/><br/><em>Fig. 10 — Iteration 2 (weight reduction)</em></td>
+<td align="center"><img src="assets/figures/iter_final.png" width="260"/><br/><em>Fig. 11 — Final iteration</em></td>
+</tr>
+</table>
+
 ## Material Selection
 
 **Carbon-Fiber Plate (frame plates).** High strength-to-weight ratio carries flight loads with minimal mass. Rigid under combined thrust and gust loads, preventing flex that would otherwise corrupt IMU readings.
@@ -151,13 +186,28 @@ Distance between base and top plate **minimised** to maximise frame torsional st
 
 **PLA+ (3D-printed attachments).** All complex geometric attachments — motor mounts, arm clamps, payload bay parts, landing gear feet — manufactured via FDM 3D printing in PLA+. Higher toughness and inter-layer adhesion than standard PLA, no warping issues during long prints.
 
+<p align="center">
+  <img src="assets/figures/cf_tube.png" width="55%" alt="3K roll-wrapped CF tubes"/>
+  <br/><em>Fig. 12 — 3K roll-wrapped carbon-fiber tube stock used for the arms</em>
+</p>
+
 ## Subsystem Selection
 
 ### Telemetry
 **Holybro SiK Telemetry Module.** MAVLink-compatible, plug-and-play with Mission Planner. 433 MHz, 500 mW output. Used for live mission upload, parameter tuning in the field, and downlink of GPS / battery / attitude.
 
+<p align="center">
+  <img src="assets/figures/subsys_telemetry.png" width="40%" alt="Holybro SiK telemetry module"/>
+  <br/><em>Fig. 13 — Holybro telemetry SiK module pair</em>
+</p>
+
 ### Radio link
 **TBS Tango 2 Pro + Crossfire receiver.** Crossfire protocol on 915 MHz, 4 km range, 8 channels — 4 for axes (roll, pitch, yaw, throttle) and 4 for flight mode switching, payload trigger, and arm/disarm.
+
+<p align="center">
+  <img src="assets/figures/subsys_rc.png" width="35%" alt="TBS Tango 2 Pro transmitter"/>
+  <br/><em>Fig. 14 — TBS Tango 2 Pro transmitter</em>
+</p>
 
 ### Flight controller
 **Pixhawk Cube Orange.**
@@ -166,8 +216,18 @@ Distance between base and top plate **minimised** to maximise frame torsional st
 - Onboard heater resistors hold IMU temperature stable to reduce gyro bias drift
 - Runs ArduPilot with the standard hexacopter mixer
 
+<p align="center">
+  <img src="assets/figures/subsys_pixhawk.png" width="40%" alt="Pixhawk Cube Orange"/>
+  <br/><em>Fig. 15 — Pixhawk Cube Orange flight controller</em>
+</p>
+
 ### GPS / INS
 **Here3 GPS.** Full inertial navigation suite — gyroscope, accelerometer, magnetometer, barometer — combined with GNSS receiver. RTK positioning data is fused with IMU/baro in the Pixhawk's Extended Kalman Filter (EKF) for sub-metre position hold.
+
+<p align="center">
+  <img src="assets/figures/subsys_gps.png" width="32%" alt="Here3 GPS"/>
+  <br/><em>Fig. 16 — Here3 RTK GPS / INS unit</em>
+</p>
 
 ### Electronic Speed Controllers
 Two **4-in-1 ESC modules** chosen instead of six individual ESCs to save weight, wiring complexity, and assembly time. Specifications:
@@ -175,25 +235,34 @@ Two **4-in-1 ESC modules** chosen instead of six individual ESCs to save weight,
 - 50 A continuous per channel
 - 1000 µF bulk capacitor per ESC to filter PWM-induced current ripple at the battery bus
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/subsys_esc1.png" width="200"/><br/><em>Fig. 17 — Speedybee 50 A 4-in-1 ESC</em></td>
+<td align="center"><img src="assets/figures/subsys_esc2.png" width="200"/><br/><em>Fig. 18 — HGLRC 50 A 4-in-1 ESC</em></td>
+</tr>
+</table>
+
 ## System Architecture
 
 <p align="center">
   <img src="architecture.png" width="100%" alt="ZEUS System Architecture"/>
 </p>
 
-```
-BLDC × 6  ←  ESC (4-in-1) × 2  ←  Pixhawk Cube Orange  ←  Mission Planner (telemetry)
-                                          ↑                       ↑
-                                    Here3 GPS / INS         TBS Tango 2 (RC)
-                                          ↑
-                                  Power Module / PDB
-                                          ↑
-                                  6S LiPo × 2 (parallel)
-```
+The original electronics block diagram from the design report:
+
+<p align="center">
+  <img src="assets/figures/electronics_block.png" width="65%" alt="Electronics block diagram"/>
+  <br/><em>Fig. 19 — Electronics architecture (design report block diagram)</em>
+</p>
 
 ## CG, Topology Optimisation & FEA
 
 **CG estimation.** Two battery slots are placed symmetrically front and back of the frame. The loaded CG falls almost exactly at the midpoint of the two battery slots and slightly above the geometric origin of the airframe — close enough to the thrust centroid that no asymmetric trim is required.
+
+<p align="center">
+  <img src="assets/figures/cg_loaded.png" width="55%" alt="Loaded CG render"/>
+  <br/><em>Fig. 20 — Loaded CG: ZEUS with payload bay attached, front view</em>
+</p>
 
 **Topology optimisation.** Two FEA load cases were run on the base plate:
 - *Method 1* — fixtures at the arm mountings, force applied at the plate centre (simulating a payload load on a hovering frame)
@@ -201,13 +270,32 @@ BLDC × 6  ←  ESC (4-in-1) × 2  ←  Pixhawk Cube Orange  ←  Mission Planne
 
 The final geometry is the **intersection** of the load paths from both methods — material is removed only where neither case carries stress.
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/topo_opt_1.png" width="320"/><br/><em>Fig. 21 — Topology optimisation, Method 1</em></td>
+<td align="center"><img src="assets/figures/topo_opt_2.png" width="320"/><br/><em>Fig. 22 — Topology optimisation, Method 2</em></td>
+</tr>
+</table>
+
 **Static structural analysis.** Whole-frame FEA was run under the maximum combined static thrust of all six motors (~120 N) to validate plate integrity under the worst-case flight load. Maximum von Mises stress stayed well below the CF laminate's yield, with peak displacement at the plate corners.
+
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/fea_frame.png" width="300"/><br/><em>Fig. 23 — Plate-level static FEA</em></td>
+<td align="center"><img src="assets/figures/fea_full.png" width="380"/><br/><em>Fig. 24 — Full-frame static FEA under 120 N thrust</em></td>
+</tr>
+</table>
 
 ## Landing Gear
 
 A **skid-type** landing gear was selected over wheeled or fixed-leg alternatives for maximum stability and ground contact area. The gear was designed in SolidWorks and run through FEA under the worst-case landing impact load to size the wall thickness. Complex skid geometry is **3D-printed in PLA+** with internal infill tuned to absorb impact energy without permanent deformation.
 
 The 100 mm clearance is the minimum that lets the payload bay clear the ground when the bay doors are open.
+
+<p align="center">
+  <img src="assets/figures/fea_landing_gear.png" width="55%" alt="Landing gear FEA"/>
+  <br/><em>Fig. 25 — Landing gear FEA under landing impact load</em>
+</p>
 
 ## Autonomous Mission
 
@@ -225,6 +313,13 @@ Arm + Take-off  →  Waypoint nav  →  Target loiter  →  Payload drop  →  R
 
 **Phase 4 — Return to Home.** On mission completion, the drone autonomously returns to the home position and performs a controlled descent.
 
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/mission_takeoff.png" width="380"/><br/><em>Fig. 26 — Mission Planner: take-off altitude set</em></td>
+<td align="center"><img src="assets/figures/mission_waypoints.png" width="380"/><br/><em>Fig. 27 — Mission Planner: waypoint plan</em></td>
+</tr>
+</table>
+
 ## Payload Drop Mechanism
 
 The payload bay sits below the frame on a **double-door release mechanism** actuated by a single servo. Key design choices:
@@ -233,6 +328,13 @@ The payload bay sits below the frame on a **double-door release mechanism** actu
 - **Single-rod lock** — a single sliding rod, driven by one servo, latches both doors. This minimises the part count and the failure modes.
 - **900 g rated capacity** — sized to the competition payload spec.
 - **Mounted below the airframe** on the centreline so the CG shift after release is purely vertical.
+
+<table align="center">
+<tr>
+<td align="center"><img src="assets/figures/payload_open.png" width="280"/><br/><em>Fig. 28 — Payload bay (doors closed, latched)</em></td>
+<td align="center"><img src="assets/figures/payload_closed.png" width="280"/><br/><em>Fig. 29 — Payload bay (servo + lock rod detail)</em></td>
+</tr>
+</table>
 
 ## Weight Breakdown
 
@@ -322,6 +424,7 @@ Final dimensioned drawing from the design report — front, right, top, and isom
 ```
 zeus/
 ├── cad/                     # SolidWorks parts, assemblies, and rendering setups
+├── assets/figures/          # Figures from the design report
 ├── architecture.svg         # System architecture diagram (vector)
 ├── architecture.png         # Rendered architecture diagram
 ├── engineering_drawing.png  # Final dimensioned drawing (4-view + W&B)
